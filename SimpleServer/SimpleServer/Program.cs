@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
+using Assets.protoSource.Login;
 
-namespace ServerApplication
+
+namespace Game
 {
     class Program
     {
@@ -14,6 +16,9 @@ namespace ServerApplication
             //Trigger the method PrintIncomingMessage when a packet of type 'Message' is received
             //We expect the incoming object to be a string which we state explicitly by using <string>
             NetworkComms.AppendGlobalIncomingPacketHandler<string>("Message", PrintIncomingMessage);
+
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>("Login", LoginMessage);
+
             //Start listening for incoming connections
             Connection.StartListening(ConnectionType.TCP, new System.Net.IPEndPoint(System.Net.IPAddress.Parse("127.0.0.1"), 12345));
 
@@ -44,5 +49,15 @@ namespace ServerApplication
             Console.WriteLine("Send Server Info to client");
 
         }
+
+        private static void LoginMessage(PacketHeader header, Connection connection, string Login)
+        {
+            LoginResult result = new LoginResult();
+
+            connection.SendObject("LoginResult", result);
+            Console.WriteLine("Send Server Info to client");
+
+        }
+
     }
 }

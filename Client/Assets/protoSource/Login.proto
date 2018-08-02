@@ -1,7 +1,3 @@
-
-package Game;
-
-
 message Login {
   required string UserSName = 1;
   required string PassWord = 2;

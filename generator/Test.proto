@@ -1,0 +1,11 @@
+message Person
+{
+   required string Name = 1 [default = "shylock"];  //赋值内容写在default内
+   optional int32 Age = 2;
+   enum TypeEnum
+   {
+      Web=1;
+	  Ios=2;
+	  News=3;
+   }
+}

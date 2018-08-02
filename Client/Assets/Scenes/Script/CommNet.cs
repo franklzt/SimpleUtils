@@ -3,6 +3,7 @@ using NetworkCommsDotNet.Connections;
 using NetworkCommsDotNet.Connections.TCP;
 using System.Threading;
 using System.Collections.Generic;
+using Assets.protoSource.Login;
 
 namespace Game
 {
@@ -21,6 +22,10 @@ namespace Game
         public  CommNet()
         {
             NetworkComms.AppendGlobalIncomingPacketHandler<string>("Message", PrintIncomingMessage);
+
+            NetworkComms.AppendGlobalIncomingPacketHandler<LoginResult>("LoginResult", LoginResult);
+
+
             connectThread = new Thread(ThreadConnect);
             connectThread.Start();
         }
@@ -37,6 +42,12 @@ namespace Game
         }
 
 
+        void LoginResult(PacketHeader header, Connection connection, LoginResult LoginResult)
+        {
+            UnityEngine.Debug.Log(string.Format("Login Result {0}", LoginResult.Result));
+        }
+
+
         void ThreadConnect()
         {
             connectWrap = new CommNetWraper(IpAddress, IpPort);
@@ -49,7 +60,18 @@ namespace Game
             {
                 string messageToSend = "This is message";
                 NetworkComms.SendObject("Message", IpAddress, IpPort, messageToSend);
+                SendLogin();
             }        
+        }
+
+        public void SendLogin()
+        {
+            Login login = new Login() { UserSName = "Player", PassWord = "Password" };
+
+            NetworkComms.SendObject("Login", IpAddress, IpPort, login);
+
+
+
         }
 
         public void OnDestroy()

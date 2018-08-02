@@ -13,7 +13,7 @@ public static class ProtoCreateUtils
         string basePath = Application.dataPath;
         string replacePath = "Client/Assets";
         basePath = basePath.Replace(replacePath, "");
-        string externalExe = string.Format("{0}generator/CodeGenerator.exe", basePath);
+        string externalExe = string.Format("{0}generator/protogen", basePath);
 
         string sourcePath = string.Format("{0}Client/Assets/protoSource/", basePath); 
 
@@ -32,9 +32,9 @@ public static class ProtoCreateUtils
             fileNames[i] = allFiles[i].Replace(sourcePath, "");
             fileNames[i] = fileNames[i].Replace(".proto", "");
 
-            string clientArg = string.Format("{0}{2}.proto --output {1}{2}.cs", sourcePath, clientPath, fileNames[i]);
-            string serverArg = string.Format("{0}{2}.proto --output {1}/{2}.cs", sourcePath, serverPath, fileNames[i]);
-            UnityEngine.Debug.Log(serverArg);
+            string clientArg = string.Format("-i:{0}{2}.proto -o:{1}{2}.cs", sourcePath, clientPath, fileNames[i]);
+            string serverArg = string.Format("-i:{0}{2}.proto -o:{1}/{2}.cs", sourcePath, serverPath, fileNames[i]);
+            UnityEngine.Debug.Log(string.Format("{0} {1}",externalExe, clientArg));
             ProcessProto(externalExe, clientArg);
             ProcessProto(externalExe, serverArg);
 
