@@ -8,19 +8,19 @@
 //------------------------------------------------------------------------------
 
 // Generated from: Assets/protoSource/Login.proto
-namespace Assets.protoSource.Login
+namespace Login
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Login")]
   public partial class Login : global::ProtoBuf.IExtensible
   {
     public Login() {}
     
-    private string _UserSName;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"UserSName", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public string UserSName
+    private string _UserName;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"UserName", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public string UserName
     {
-      get { return _UserSName; }
-      set { _UserSName = value; }
+      get { return _UserName; }
+      set { _UserName = value; }
     }
     private string _PassWord;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"PassWord", DataFormat = global::ProtoBuf.DataFormat.Default)]

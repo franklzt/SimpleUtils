@@ -60,15 +60,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\protoCode\Login.cs" />
+    <Compile Include="Assets\messageCode\LoginHandler.cs" />
+    <Compile Include="Assets\messageCode\Loginmessage.cs" />
+    <Compile Include="Assets\messageCode\LoginResultHandler.cs" />
+    <Compile Include="Assets\messageCode\LoginResultmessage.cs" />
+    <Compile Include="Assets\protoCode\GameProto.cs" />
     <Compile Include="Assets\Scenes\Script\CommNet.cs" />
     <Compile Include="Assets\Scenes\Script\GameRoot.cs" />
+    <Compile Include="Assets\Scenes\Script\NetHelperGenerator.cs" />
     <Compile Include="Assets\Scenes\Script\NetUIDemo.cs" />
     <None Include="Assets\Scenes\Comm\QuickLZCompressor.xml" />
     <None Include="Assets\Scenes\Comm\ProtobufSerializer.xml" />
+    <None Include="Assets\Helper\Templemate\Message.txt" />
     <None Include="Assets\Scenes\Comm\protobuf-net.xml" />
     <None Include="Assets\Scenes\Comm\NetworkCommsDotNet.xml" />
     <None Include="Assets\Scenes\Comm\SharpZipLibCompressor.xml" />
+    <None Include="Assets\Helper\Templemate\MessageHandler.txt" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>K:/SimpleUtils/Client/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>

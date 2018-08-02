@@ -3,7 +3,6 @@ using NetworkCommsDotNet.Connections;
 using NetworkCommsDotNet.Connections.TCP;
 using System.Threading;
 using System.Collections.Generic;
-using Assets.protoSource.Login;
 
 namespace Game
 {
@@ -23,7 +22,7 @@ namespace Game
         {
             NetworkComms.AppendGlobalIncomingPacketHandler<string>("Message", PrintIncomingMessage);
 
-            NetworkComms.AppendGlobalIncomingPacketHandler<LoginResult>("LoginResult", LoginResult);
+            //NetworkComms.AppendGlobalIncomingPacketHandler<LoginResult>("LoginResult", LoginResult);
 
 
             connectThread = new Thread(ThreadConnect);
@@ -42,10 +41,10 @@ namespace Game
         }
 
 
-        void LoginResult(PacketHeader header, Connection connection, LoginResult LoginResult)
-        {
-            UnityEngine.Debug.Log(string.Format("Login Result {0}", LoginResult.Result));
-        }
+        //void LoginResult(PacketHeader header, Connection connection, LoginResult LoginResult)
+        //{
+        //    UnityEngine.Debug.Log(string.Format("Login Result {0}", LoginResult.Result));
+        //}
 
 
         void ThreadConnect()
@@ -66,12 +65,8 @@ namespace Game
 
         public void SendLogin()
         {
-            Login login = new Login() { UserSName = "Player", PassWord = "Password" };
-
-            NetworkComms.SendObject("Login", IpAddress, IpPort, login);
-
-
-
+            //Login login = new Login() { UserName = "Player", PassWord = "Password" };
+            //NetworkComms.SendObject("Login", IpAddress, IpPort, login);
         }
 
         public void OnDestroy()

@@ -1,8 +1,0 @@
-message Login {
-  required string UserSName = 1;
-  required string PassWord = 2;
-}
-
-message LoginResult {
-    required int32 Result = 1;
-}

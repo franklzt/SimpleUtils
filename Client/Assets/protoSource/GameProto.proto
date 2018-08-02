@@ -1,0 +1,10 @@
+package GameProto;
+
+message Login {
+  required string UserName = 1;
+  required string PassWord = 2;
+}
+
+message LoginResult {
+    required int32 Result = 1;
+}
