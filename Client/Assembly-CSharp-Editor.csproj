@@ -314,22 +314,22 @@
       <HintPath>E:/Program Files/Unity 2018.2/Editor/Data/PlaybackEngines/windowsstandalonesupport/UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>E:/SimpleUtils/Client/Assets/Scenes/Comm/ICSharpCode.SharpZipLib.dll</HintPath>
+      <HintPath>E:/SimpleUtils/Client/Assets/Plugins/ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="NetworkCommsDotNet">
-      <HintPath>E:/SimpleUtils/Client/Assets/Scenes/Comm/NetworkCommsDotNet.dll</HintPath>
+      <HintPath>E:/SimpleUtils/Client/Assets/Plugins/NetworkCommsDotNet.dll</HintPath>
     </Reference>
     <Reference Include="protobuf-net">
-      <HintPath>E:/SimpleUtils/Client/Assets/Scenes/Comm/protobuf-net.dll</HintPath>
+      <HintPath>E:/SimpleUtils/Client/Assets/Plugins/protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="ProtobufSerializer">
-      <HintPath>E:/SimpleUtils/Client/Assets/Scenes/Comm/ProtobufSerializer.dll</HintPath>
+      <HintPath>E:/SimpleUtils/Client/Assets/Plugins/ProtobufSerializer.dll</HintPath>
     </Reference>
     <Reference Include="QuickLZCompressor">
-      <HintPath>E:/SimpleUtils/Client/Assets/Scenes/Comm/QuickLZCompressor.dll</HintPath>
+      <HintPath>E:/SimpleUtils/Client/Assets/Plugins/QuickLZCompressor.dll</HintPath>
     </Reference>
     <Reference Include="SharpZipLibCompressor">
-      <HintPath>E:/SimpleUtils/Client/Assets/Scenes/Comm/SharpZipLibCompressor.dll</HintPath>
+      <HintPath>E:/SimpleUtils/Client/Assets/Plugins/SharpZipLibCompressor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.Advertisements">
       <HintPath>C:/Users/Administered/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.ads@2.0.8/Editor/UnityEditor.Advertisements.dll</HintPath>

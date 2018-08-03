@@ -65,16 +65,19 @@
     <Compile Include="Assets\messageCode\LoginResultHandler.cs" />
     <Compile Include="Assets\messageCode\LoginResultmessage.cs" />
     <Compile Include="Assets\protoCode\GameProto.cs" />
-    <Compile Include="Assets\Scenes\Script\CommNet.cs" />
-    <Compile Include="Assets\Scenes\Script\GameRoot.cs" />
-    <Compile Include="Assets\Scenes\Script\NetHelperGenerator.cs" />
-    <Compile Include="Assets\Scenes\Script\NetUIDemo.cs" />
-    <None Include="Assets\Scenes\Comm\QuickLZCompressor.xml" />
-    <None Include="Assets\Scenes\Comm\ProtobufSerializer.xml" />
+    <Compile Include="Assets\Script\Bag\Bag.cs" />
+    <Compile Include="Assets\Script\Bag\BagView.cs" />
+    <Compile Include="Assets\Script\CommNet.cs" />
+    <Compile Include="Assets\Script\Extensions\SimpleUtils.cs" />
+    <Compile Include="Assets\Script\Extensions\SimpleUtilTools.cs" />
+    <Compile Include="Assets\Script\GameRoot.cs" />
+    <Compile Include="Assets\Script\Generic\Generic.cs" />
+    <Compile Include="Assets\Script\NetHelperGenerator.cs" />
+    <Compile Include="Assets\Script\NetUIDemo.cs" />
+    <Compile Include="Assets\Script\Root\ViewRoot.cs" />
+    <Compile Include="Assets\Script\Test\TestView.cs" />
+    <None Include="Assets\Resources\data.txt" />
     <None Include="Assets\Helper\Templemate\Message.txt" />
-    <None Include="Assets\Scenes\Comm\protobuf-net.xml" />
-    <None Include="Assets\Scenes\Comm\NetworkCommsDotNet.xml" />
-    <None Include="Assets\Scenes\Comm\SharpZipLibCompressor.xml" />
     <None Include="Assets\Helper\Templemate\MessageHandler.txt" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>E:/SimpleUtils/Client/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
@@ -284,22 +287,22 @@
       <HintPath>E:/Program Files/Unity 2018.2/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>E:/SimpleUtils/Client/Assets/Scenes/Comm/ICSharpCode.SharpZipLib.dll</HintPath>
+      <HintPath>E:/SimpleUtils/Client/Assets/Plugins/ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="NetworkCommsDotNet">
-      <HintPath>E:/SimpleUtils/Client/Assets/Scenes/Comm/NetworkCommsDotNet.dll</HintPath>
+      <HintPath>E:/SimpleUtils/Client/Assets/Plugins/NetworkCommsDotNet.dll</HintPath>
     </Reference>
     <Reference Include="protobuf-net">
-      <HintPath>E:/SimpleUtils/Client/Assets/Scenes/Comm/protobuf-net.dll</HintPath>
+      <HintPath>E:/SimpleUtils/Client/Assets/Plugins/protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="ProtobufSerializer">
-      <HintPath>E:/SimpleUtils/Client/Assets/Scenes/Comm/ProtobufSerializer.dll</HintPath>
+      <HintPath>E:/SimpleUtils/Client/Assets/Plugins/ProtobufSerializer.dll</HintPath>
     </Reference>
     <Reference Include="QuickLZCompressor">
-      <HintPath>E:/SimpleUtils/Client/Assets/Scenes/Comm/QuickLZCompressor.dll</HintPath>
+      <HintPath>E:/SimpleUtils/Client/Assets/Plugins/QuickLZCompressor.dll</HintPath>
     </Reference>
     <Reference Include="SharpZipLibCompressor">
-      <HintPath>E:/SimpleUtils/Client/Assets/Scenes/Comm/SharpZipLibCompressor.dll</HintPath>
+      <HintPath>E:/SimpleUtils/Client/Assets/Plugins/SharpZipLibCompressor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Analytics">
       <HintPath>C:/Users/Administered/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>
