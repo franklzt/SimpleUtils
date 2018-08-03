@@ -1,29 +1,19 @@
-﻿using UnityEditor;
-using UnityEngine;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
-using System.Security.AccessControl;
-using Debug = UnityEngine.Debug;
 using System.Text.RegularExpressions;
-using System;
-
+using UnityEditor;
+using UnityEngine;
 
 public static class ProtoCreateUtils
 {
-
     [MenuItem("Assets/UpdateProto")]
-    static void CreateMyLua()
+    private static void UpdateProto()
     {
-        string basePath = Application.dataPath;
-        string replacePath = "Client/Assets";
-        basePath = basePath.Replace(replacePath, "");
+        string basePath = GetBasePath();
         string externalExe = string.Format("{0}generator/protogen", basePath);
-
         string sourcePath = string.Format("{0}Client/Assets/protoSource/", basePath);
-
         string clientPath = string.Format("{0}Client/Assets/protoCode/", basePath);
         string serverPath = string.Format("{0}SimpleServer/SimpleServer/proto", basePath);
-
 
         string[] allFiles = Directory.GetFiles(sourcePath, "*.proto");
         string[] fileNames = new string[allFiles.Length];
@@ -38,21 +28,18 @@ public static class ProtoCreateUtils
             UnityEngine.Debug.Log(string.Format("{0} {1}", externalExe, clientArg));
             ProcessProto(externalExe, clientArg);
             ProcessProto(externalExe, serverArg);
-
         }
     }
 
-    static void SecureDeleteDir(string dirPath)
+    private static string GetBasePath()
     {
-        if (Directory.Exists(dirPath))
-        {
-            Directory.Delete(dirPath, true);
-        }
-        //DirectorySecurity directorySecurity = new DirectorySecurity(dirPath, AccessControlSections.All);
-        Directory.CreateDirectory(dirPath);
+        string basePath = Application.dataPath;
+        string replacePath = "Client/Assets";
+        basePath = basePath.Replace(replacePath, "");
+        return basePath;
     }
 
-    static void ProcessProto(string exePath, string arg)
+    private static void ProcessProto(string exePath, string arg)
     {
         Process foo = new Process();
         foo.StartInfo.FileName = exePath;
@@ -61,7 +48,14 @@ public static class ProtoCreateUtils
     }
 
     [MenuItem("Assets/GenerateCode")]
-    static void GenerateCode()
+    private static void GenerateCode()
+    {
+        GenerateMessageCode();
+        CopyMessageCodeToServer();
+        AssetDatabase.Refresh();
+    }
+
+    private static void GenerateMessageCode()
     {
         string protoSourcePath = string.Format("{0}/protoSource", Application.dataPath);
         string[] files = Directory.GetFiles(protoSourcePath, "*.proto");
@@ -70,92 +64,155 @@ public static class ProtoCreateUtils
 
         new MessageCodeHelper().SetupCode(files, protoSourcePath, messageFilePath);
         new HandleCodeHelper().SetupCode(files, protoSourcePath, handleFilePath);
-
-        AssetDatabase.Refresh();
     }
 
-    class CodeBase
+    private static void CopyMessageCodeToServer()
     {
-        public void SetupCode(string[] files, string protoSourcePath, string fileNamePattern,string messageFilePath,bool isReplace)
+        string serverPattern = "SimpleServer/SimpleServer/messageCode";
+        string serverPath = string.Format("{0}{1}", GetBasePath(), serverPattern);
+        string clientPattern = "Client/Assets/messageCode";
+        string clientPath = string.Format("{0}{1}", GetBasePath(), clientPattern);
+
+        if (!Directory.Exists(serverPath))
         {
-            string nameSpacePattern = @"{$FileName}";
-            string classNamePattern = @"$ClassName";
-            string messageContent = File.ReadAllText(messageFilePath);
+            Directory.CreateDirectory(serverPath);
+        }
+        string[] clientMessageFiles = Directory.GetFiles(clientPath, "*.cs");
+        for (int i = 0; i < clientMessageFiles.Length; i++)
+        {
+            string serverFileName = clientMessageFiles[i].Replace(clientPattern, serverPattern);
+            File.Copy(clientMessageFiles[i], serverFileName,true);
+        }
+    }
 
-            for (int i = 0; i < files.Length; i++)
+}
+
+public class CodeBase
+{
+    public void SetupCode(string[] files, string protoSourcePath, string fileNamePattern, string messageFilePath, bool isReplace = true)
+    {
+        string nameSpacePattern = @"{$FileName}";
+        string classNamePattern = @"$ClassName";
+        string messageContent = File.ReadAllText(messageFilePath);
+
+        for (int i = 0; i < files.Length; i++)
+        {
+            string namespaceReplace = files[i];
+            string replace = string.Format(@"{0}\", protoSourcePath);
+            namespaceReplace = namespaceReplace.Replace(replace, "").Replace(".proto", "");
+
+            string proto = File.ReadAllText(files[i]);
+
+            string pattern = @"(?<=message).*?(?=\{)";
+
+            Regex regex = new Regex(pattern);
+
+            MatchCollection matchCollection = regex.Matches(proto);
+            foreach (Match classPatternReplace in matchCollection)
             {
-                string namespaceReplace = files[i];
-                string replace = string.Format(@"{0}\", protoSourcePath);
-                namespaceReplace = namespaceReplace.Replace(replace, "").Replace(".proto", "");
+                string messageScript = messageContent;
+                string trimClassPattern = classPatternReplace.Value.Trim();
+                messageScript = messageScript.Replace(nameSpacePattern, namespaceReplace);
+                messageScript = messageScript.Replace(classNamePattern, trimClassPattern);
 
-                string proto = File.ReadAllText(files[i]);
-
-                string pattern = @"(?<=message).*?(?=\{)";
-
-                Regex regex = new Regex(pattern);
-
-                MatchCollection matchCollection = regex.Matches(proto);
-                foreach (Match classPatternReplace in matchCollection)
-                {
-                    string messageScript = messageContent;
-                    string trimClassPattern = classPatternReplace.Value.Trim();
-                    messageScript = messageScript.Replace(nameSpacePattern, namespaceReplace);
-                    messageScript = messageScript.Replace(classNamePattern, trimClassPattern);
-
-                    string generateCodeFileName = string.Format("{0}{1}", trimClassPattern, fileNamePattern);
-                    new GenerateCodeToFile(generateCodeFileName, messageScript, isReplace);
-                }
+                string generateCodeFileName = string.Format("{0}{1}", trimClassPattern, fileNamePattern);
+                GenerateCodeClientPath generateCodeClientPath = new GenerateCodeClientPath(generateCodeFileName);
+                new GenerateCodeToFile(generateCodeClientPath, messageScript, isReplace);
             }
         }
     }
+}
 
-    class MessageCodeHelper
+public class MessageCodeHelper
+{
+    public void SetupCode(string[] files, string protoSourcePath, string messageFilePath, bool replaceFile = true)
     {
-        public void SetupCode(string[] files, string protoSourcePath, string messageFilePath,bool replaceFile = true)
-        {
-            CodeBase codeBase = new CodeBase();
-            codeBase.SetupCode(files, protoSourcePath, "message",messageFilePath,replaceFile);
-        }
+        CodeBase codeBase = new CodeBase();
+        codeBase.SetupCode(files, protoSourcePath, "message", messageFilePath, replaceFile);
+    }
+}
+
+public class HandleCodeHelper
+{
+    public void SetupCode(string[] files, string protoSourcePath, string messageFilePath)
+    {
+        CodeBase codeBase = new CodeBase();
+        codeBase.SetupCode(files, protoSourcePath, "Handler", messageFilePath, false);
+    }
+}
+
+public class GenerateCodeBasePath
+{
+    protected readonly string _fileName;
+    public GenerateCodeBasePath(string fileName)
+    {
+        _fileName = fileName;
     }
 
-    class HandleCodeHelper
+    public virtual string GetFilePath()
     {
-        public void SetupCode(string[] files, string protoSourcePath, string messageFilePath)
-        {
-            CodeBase codeBase = new CodeBase();
-            codeBase.SetupCode(files, protoSourcePath, "Handler", messageFilePath, false);
-        }
+        return "";
     }
 
-    class GenerateCodeToFile
+    public string FileName()
     {
-        string generateCodePath = "";
-        void WriteToFile(string fileName, string script)
-        {           
-            FileStream fileStream = File.Create(generateCodePath);
-            byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(script);
-            fileStream.Write(byteArray, 0, byteArray.Length);
-            fileStream.Close();
-        }
+        return _fileName;
+    }
+}
 
-        public GenerateCodeToFile(string fileName, string script, bool replacefile = true)
-        {
-            generateCodePath = string.Format("{0}/messageCode/{1}.cs", Application.dataPath, fileName);
+public class GenerateCodeClientPath : GenerateCodeBasePath
+{
+    public GenerateCodeClientPath(string fileName) : base(fileName)
+    {
 
-            bool needReaceCode = true;
-
-            if (!File.Exists(generateCodePath))
-            {
-                WriteToFile(fileName, script);
-                needReaceCode = false;
-            }
-
-            if(replacefile && needReaceCode)
-            {
-                File.Delete(generateCodePath);
-                WriteToFile(fileName, script);
-            }
-        }
     }
 
+    public override string GetFilePath()
+    {
+        return string.Format("{0}/messageCode/{1}.cs", Application.dataPath, _fileName);
+    }
+}
+
+public class GenerateCodeServerPath : GenerateCodeBasePath
+{
+    public GenerateCodeServerPath(string fileName) : base(fileName)
+    {
+
+    }
+
+    public override string GetFilePath()
+    {
+        return string.Format("{0}/messageCode/{1}.cs", Application.dataPath, _fileName);
+    }
+}
+
+public class GenerateCodeToFile
+{
+    private readonly string generateCodePath = "";
+
+    private void WriteToFile(string fileName, string script)
+    {
+        FileStream fileStream = File.Create(generateCodePath);
+        byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(script);
+        fileStream.Write(byteArray, 0, byteArray.Length);
+        fileStream.Close();
+    }
+
+    public GenerateCodeToFile(GenerateCodeBasePath basePath, string script, bool replacefile = true)
+    {
+        generateCodePath = basePath.GetFilePath();
+        bool needReaceCode = true;
+
+        if (!File.Exists(generateCodePath))
+        {
+            WriteToFile(basePath.FileName(), script);
+            needReaceCode = false;
+        }
+
+        if (replacefile && needReaceCode)
+        {
+            File.Delete(generateCodePath);
+            WriteToFile(basePath.FileName(), script);
+        }
+    }
 }
