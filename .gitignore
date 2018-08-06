@@ -1,8 +1,8 @@
-Client/[Ll]ibrary/
-Client/[Tt]emp/
-Client/[Oo]bj/
-Client/[Bb]uild/
-Client/[Bb]uilds/
+Client/Library/
+Client/Temp/
+Client/Obj/
+Client/Build/
+Client/Builds/
 Client/Assets/AssetStoreTools*
 
 # Visual Studio cache directory
@@ -37,6 +37,8 @@ sysinfo.txt
 
 #log
 *.log
-
+*.info
 SimpleServer/SimpleServer/bin/
 
+Client/Library/metadata/e5/e5ec1aee3e4381f488e7b2d67d65313b.info
+Client/Library/metadata/00/00000000000000006100000000000000
