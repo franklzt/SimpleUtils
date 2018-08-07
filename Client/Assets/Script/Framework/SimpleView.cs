@@ -7,4 +7,6 @@ public class SimpleView : MonoBehaviour
 {
     public Button inputButton;
     public Text outputText;
+
+    
 }
