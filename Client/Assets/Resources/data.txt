@@ -1,1 +1,1 @@
-apple,armor,axe,b_t_01,bag,belts,book,boots,bracers,cloaks,coins,f,gem,gloves,helmets,hp,ingots,Meat,mp,necklace,pants,rings,scroll,shield,shoulders,sword,
+apple,armor,axe,b_t_01,bag,belts,book,boots,bracers,cloaks,coins,f,gem,gloves,helmets,hp,ingots,Meat,mp,necklace,pants,rings,scroll,shield,shoulders,sword
