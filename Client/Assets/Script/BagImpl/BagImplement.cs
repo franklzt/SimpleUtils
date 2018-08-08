@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using RandomElement;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using RandomElement;
 
 namespace BagImplement
 {
     public class BagImplement : MonoBehaviour
     {
-        BagController BagController;
+        private BagController BagController;
         public Transform viewParent;
         private void Start()
         {
@@ -20,7 +20,8 @@ namespace BagImplement
     public class BagViewManager
     {
         public List<BagViewItem> BagViewItems { get; }
-        Transform parent;
+
+        private readonly Transform parent;
         public BagViewManager(Transform parent)
         {
             this.parent = parent;
@@ -33,31 +34,56 @@ namespace BagImplement
     {
         public Image BagIccon { get; }
         public Text BagText { get; }
+        public Image BagBG { get; }
+
         public BagViewItem(Transform parent)
         {
             GameObject bagViewRoot = new GameObject("GameRoot");
             bagViewRoot.transform.SetParent(parent);
             bagViewRoot.transform.position = Vector3.zero;
             bagViewRoot.AddComponent<RectTransform>();
+
             BagIccon = new GameObject("BagIccon").AddComponent<Image>();
             BagIccon.transform.SetParent(bagViewRoot.transform);
+
             BagText = new GameObject("BagText").AddComponent<Text>();
             BagText.transform.SetParent(bagViewRoot.transform);
+            BagText.color = Color.black;
+
+
+
 
             RectTransform bagIconRect = BagIccon.GetComponent<RectTransform>();
             bagIconRect.anchoredPosition = Vector2.zero;
-
             RectTransform textIconRect = BagText.GetComponent<RectTransform>();
-            textIconRect.anchoredPosition = Vector2.zero;
+            textIconRect.anchoredPosition = new Vector2(0,-38);
+            textIconRect.sizeDelta = new Vector2(90, 18);
+
+            BagBG = new GameObject("Frame").AddComponent<Image>();
+            BagBG.transform.SetParent(bagViewRoot.transform);
+            RectTransform bagBGIconRect = BagBG.GetComponent<RectTransform>();
+            bagBGIconRect.anchoredPosition = Vector2.zero;
+        }
+
+        public void UpdateFrameIcon(Sprite frameSprite)
+        {
+            BagBG.sprite = frameSprite;
+        }
+
+        public void UpdateFront(Font font)
+        {
+            BagText.font = font;
         }
     }
+
+
 
     public class BagController
     {
         public BagManger bagManger { get; }
         public PlayerBagItmeManager playerBagItmeManager { get; }
         public BagViewManager bagViewManager;
-        Transform parent;
+        private readonly Transform parent;
         public BagController(Transform parent)
         {
             this.parent = parent;
@@ -70,6 +96,9 @@ namespace BagImplement
 
         public void LoadInitData()
         {
+            BagItme bagFrameItem = bagManger.GetFrameItem();
+            Font font = Resources.Load<Font>("arial");
+
             for (int i = 0; i < playerBagItmeManager.PlayerBagItems.Count; i++)
             {
                 int playItmeIndex = playerBagItmeManager.PlayerBagItems[i].PlayerBagID;
@@ -79,42 +108,12 @@ namespace BagImplement
                 BagViewItem bagViewItem = new BagViewItem(parent);
                 bagViewItem.BagText.text = bagItme.BagId.ToString();
                 bagViewItem.BagIccon.sprite = bagItme.GetSprite;
+                bagViewItem.UpdateFrameIcon(bagFrameItem.GetSprite);
+                bagViewItem.UpdateFront(font);
                 bagViewManager.BagViewItems.Add(bagViewItem);
             }
         }
     }
-
-
-    public class BagManger
-    {
-        public List<BagItme> BagItmes { get; }
-        public BagManger()
-        {
-            BagItmes = new List<BagItme>();
-        }
-        public void LoadData()
-        {
-            string[] tempIconAssets = this.ReadData();
-            for (int i = 0; i < tempIconAssets.Length; i++)
-            {
-                BagItme bagItme = new BagItme(tempIconAssets[i], i);
-                BagItmes.Add(bagItme);
-            }
-        }
-
-        public BagItme GetBagItme(int BagId)
-        {
-            for (int i = 0; i < BagItmes.Count; i++)
-            {
-                if (BagId == BagItmes[i].BagId)
-                {
-                    return BagItmes[i];
-                }
-            }
-            return null;
-        }
-    }
-
 
     public class PlayerBagItmeManager
     {
@@ -155,6 +154,54 @@ namespace BagImplement
             PlayerBagID = playerId;
         }
     }
+
+
+    public class BagManger
+    {
+        public List<BagItme> BagItmes { get; }
+        public int FrameItemIndex { get; }
+
+        public BagManger()
+        {
+            BagItmes = new List<BagItme>();
+            FrameItemIndex = 11;
+        }
+        public void LoadData()
+        {
+            string[] tempIconAssets = this.ReadData();
+            for (int i = 0; i < tempIconAssets.Length; i++)
+            {
+
+                BagItme bagItme = new BagItme(tempIconAssets[i], i);
+                BagItmes.Add(bagItme);
+
+            }
+        }
+
+        public BagItme GetFrameItem()
+        {
+            return BagItmes[FrameItemIndex];
+        }
+
+
+        public BagItme GetBagItme(int BagId)
+        {
+            if (BagId == FrameItemIndex)
+            {
+                return BagItmes[20];
+            }
+
+            for (int i = 0; i < BagItmes.Count; i++)
+            {
+                if (BagId == BagItmes[i].BagId)
+                {
+                    return BagItmes[i];
+                }
+            }
+            return null;
+        }
+    }
+
 
     public class BagItme
     {
