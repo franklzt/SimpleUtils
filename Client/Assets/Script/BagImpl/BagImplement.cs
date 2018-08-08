@@ -16,73 +16,11 @@ namespace BagImplement
         }
     }
 
-
-    public class BagViewManager
-    {
-        public List<BagViewItem> BagViewItems { get; }
-
-        private readonly Transform parent;
-        public BagViewManager(Transform parent)
-        {
-            this.parent = parent;
-            BagViewItems = new List<BagViewItem>();
-        }
-    }
-
-
-    public class BagViewItem
-    {
-        public Image BagIccon { get; }
-        public Text BagText { get; }
-        public Image BagBG { get; }
-
-        public BagViewItem(Transform parent)
-        {
-            GameObject bagViewRoot = new GameObject("GameRoot");
-            bagViewRoot.transform.SetParent(parent);
-            bagViewRoot.transform.position = Vector3.zero;
-            bagViewRoot.AddComponent<RectTransform>();
-
-            BagIccon = new GameObject("BagIccon").AddComponent<Image>();
-            BagIccon.transform.SetParent(bagViewRoot.transform);
-
-            BagText = new GameObject("BagText").AddComponent<Text>();
-            BagText.transform.SetParent(bagViewRoot.transform);
-            BagText.color = Color.black;
-
-
-
-
-            RectTransform bagIconRect = BagIccon.GetComponent<RectTransform>();
-            bagIconRect.anchoredPosition = Vector2.zero;
-            RectTransform textIconRect = BagText.GetComponent<RectTransform>();
-            textIconRect.anchoredPosition = new Vector2(0,-38);
-            textIconRect.sizeDelta = new Vector2(90, 18);
-
-            BagBG = new GameObject("Frame").AddComponent<Image>();
-            BagBG.transform.SetParent(bagViewRoot.transform);
-            RectTransform bagBGIconRect = BagBG.GetComponent<RectTransform>();
-            bagBGIconRect.anchoredPosition = Vector2.zero;
-        }
-
-        public void UpdateFrameIcon(Sprite frameSprite)
-        {
-            BagBG.sprite = frameSprite;
-        }
-
-        public void UpdateFront(Font font)
-        {
-            BagText.font = font;
-        }
-    }
-
-
-
     public class BagController
     {
         public BagManger bagManger { get; }
         public PlayerBagItmeManager playerBagItmeManager { get; }
-        public BagViewManager bagViewManager;
+        public BagView BagView;
         private readonly Transform parent;
         public BagController(Transform parent)
         {
@@ -91,7 +29,7 @@ namespace BagImplement
             bagManger.LoadData();
             playerBagItmeManager = new PlayerBagItmeManager();
             playerBagItmeManager.LoadData();
-            bagViewManager = new BagViewManager(parent);
+            BagView = new BagView();
         }
 
         public void LoadInitData()
@@ -110,11 +48,71 @@ namespace BagImplement
                 bagViewItem.BagIccon.sprite = bagItme.GetSprite;
                 bagViewItem.UpdateFrameIcon(bagFrameItem.GetSprite);
                 bagViewItem.UpdateFront(font);
-                bagViewManager.BagViewItems.Add(bagViewItem);
+                BagView.Add(bagViewItem);
             }
+
+
         }
     }
+    public class BagView
+    {
+        public List<BagViewItem> BagViewItems { get; }
+        public BagView()
+        {
+            BagViewItems = new List<BagViewItem>();
+        }
 
+        public void Add(BagViewItem bagViewItem)
+        {
+            BagViewItems.Add(bagViewItem);
+        }
+    }
+    public class BagViewItem
+    {
+        public Image BagIccon { get; }
+        public Text BagText { get; }
+        public Image BagBG { get; }
+
+        public BagViewItem(Transform parent)
+        {
+
+            GameObject bagViewRoot = new GameObject("GameRoot");
+            bagViewRoot.transform.SetParent(parent);
+            bagViewRoot.transform.position = Vector3.zero;
+            bagViewRoot.AddComponent<RectTransform>();
+
+            BagIccon = new GameObject("BagIccon").AddComponent<Image>();
+            BagIccon.transform.SetParent(bagViewRoot.transform);
+
+            BagText = new GameObject("BagText").AddComponent<Text>();
+            BagText.transform.SetParent(bagViewRoot.transform);
+            BagText.color = Color.black;
+
+
+
+
+            RectTransform bagIconRect = BagIccon.GetComponent<RectTransform>();
+            bagIconRect.anchoredPosition = Vector2.zero;
+            RectTransform textIconRect = BagText.GetComponent<RectTransform>();
+            textIconRect.anchoredPosition = new Vector2(0, -38);
+            textIconRect.sizeDelta = new Vector2(90, 18);
+
+            BagBG = new GameObject("Frame").AddComponent<Image>();
+            BagBG.transform.SetParent(bagViewRoot.transform);
+            RectTransform bagBGIconRect = BagBG.GetComponent<RectTransform>();
+            bagBGIconRect.anchoredPosition = Vector2.zero;
+        }
+
+        public void UpdateFrameIcon(Sprite frameSprite)
+        {
+            BagBG.sprite = frameSprite;
+        }
+
+        public void UpdateFront(Font font)
+        {
+            BagText.font = font;
+        }
+    }
     public class PlayerBagItmeManager
     {
         public List<PlayerBagItem> PlayerBagItems { get; }
@@ -145,7 +143,6 @@ namespace BagImplement
             return PlayerBagItems[index];
         }
     }
-
     public class PlayerBagItem
     {
         public int PlayerBagID { get; }
@@ -154,8 +151,6 @@ namespace BagImplement
             PlayerBagID = playerId;
         }
     }
-
-
     public class BagManger
     {
         public List<BagItme> BagItmes { get; }
@@ -201,8 +196,6 @@ namespace BagImplement
             return null;
         }
     }
-
-
     public class BagItme
     {
         public string BagIcon { get; }
@@ -224,5 +217,53 @@ namespace BagImplement
     }
 }
 
+namespace SimpleFramework
+{
+    public class SimpleBase
+    {
+        public int CompareID = 0;
+        public bool TheSameAs(SimpleBase other)
+        {
+            return CompareID == other.CompareID;
+        }
+    }
 
+    public class SimpleData<T, U> where T : SimpleBase
+    {
+        public U ReferenceU { get; set; }
+        public T ReferenceT { get; }
+        public SimpleData(U referenceU)
+        {
+            ReferenceT = default(T);
+            ReferenceU = referenceU;
+        }
+    }
 
+    public class SimpleDataManager<T, U> where T : SimpleBase
+    {
+        List<SimpleData<T, U>> listData = new List<SimpleData<T, U>>();
+        public void AddOrUpdate(SimpleData<T, U> other)
+        {
+            for (int i = 0; i < listData.Count; i++)
+            {
+                if (listData[i].ReferenceT.TheSameAs(other.ReferenceT))
+                {
+                    listData[i] = other;
+                    return;
+                }
+            }
+            listData.Add(other);
+        }
+    }
+
+    public class SimpleModel
+    {
+        public string modelData = "modelData";
+    }
+
+    public class SimpleModelManager : SimpleDataManager<SimpleBase, SimpleModel>
+    {
+
+    }
+
+}
