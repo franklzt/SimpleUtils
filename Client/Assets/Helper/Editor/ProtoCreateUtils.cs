@@ -6,7 +6,7 @@ using UnityEngine;
 
 public static class ProtoCreateUtils
 {
-    [MenuItem("Assets/UpdateProto")]
+    [MenuItem("Assets/Helper/UpdateProto")]
     private static void UpdateProto()
     {
         string basePath = GetBasePath();
@@ -47,7 +47,7 @@ public static class ProtoCreateUtils
         foo.Start();
     }
 
-    [MenuItem("Assets/GenerateCode")]
+    [MenuItem("Assets/Helper/GenerateCode")]
     private static void GenerateCode()
     {
         GenerateMessageCode();
@@ -81,7 +81,7 @@ public static class ProtoCreateUtils
         for (int i = 0; i < clientMessageFiles.Length; i++)
         {
             string serverFileName = clientMessageFiles[i].Replace(clientPattern, serverPattern);
-            File.Copy(clientMessageFiles[i], serverFileName,true);
+            File.Copy(clientMessageFiles[i], serverFileName, true);
         }
     }
 

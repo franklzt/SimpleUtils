@@ -4,10 +4,11 @@ using System.IO;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
+using System.Collections.Generic;
 
 public static class ExcelCodeGenerator
 {
-    [MenuItem("Assets/ExcelCodeGenerator")]
+    [MenuItem("Assets/Helper/ExcelCodeGenerator")]
     private static void CodeGeneratorFromExcelFiles()
     {
         string fileDir = "ExcelFiles";
@@ -23,7 +24,6 @@ public static class ExcelCodeGenerator
 
         string[] filesNames = Directory.GetFiles(excelFileBase, "*.xlsx");
 
-        Debug.Log(filesNames[0]);
 
         handlers = new ExcelHandleBase[filesNames.Length];
         handlers[0] = new ExcelHandleBase(new ComplexHandleTemple());
@@ -51,6 +51,7 @@ public class ExcelHandleBase
     public void StartReadData(string path)
     {
         FileStream excelStream = File.Open(path, FileMode.Open, FileAccess.Read);
+
         reader = ExcelReaderFactory.CreateReader(excelStream, new ExcelReaderConfiguration { FallbackEncoding = Encoding.GetEncoding(1252) });
         handleTempleInterface.Handler(reader.AsDataSet(new ExcelDataSetConfiguration()
         {
@@ -72,25 +73,30 @@ public class ExcelHandleBase
 
                 // Gets or sets a callback to determine which row is the header row. 
                 // Only called when UseHeaderRow = true.
-                ReadHeaderRow = (rowReader) => {
+                ReadHeaderRow = (rowReader) =>
+                {
                     // F.ex skip the first row and use the 2nd row as column headers:
                     rowReader.Read();
                 },
 
                 // Gets or sets a callback to determine whether to include the 
                 // current row in the DataTable.
-                FilterRow = (rowReader) => {
+                FilterRow = (rowReader) =>
+                {
                     return true;
                 },
 
                 // Gets or sets a callback to determine whether to include the specific
                 // column in the DataTable. Called once per column after reading the 
                 // headers.
-                FilterColumn = (rowReader, columnIndex) => {
+                FilterColumn = (rowReader, columnIndex) =>
+                {
                     return true;
                 }
             }
         }));
+
+        reader.Dispose();
         excelStream.Close();
     }
 }
@@ -105,7 +111,8 @@ public class SimpleHandleTemple : HandleTempleInterface
 {
     public void Handler(DataSet result)
     {
-        Debug.Log(result.GetXml());
+
+
     }
 }
 
@@ -114,6 +121,44 @@ public class NormalHandleTemple : HandleTempleInterface
     public void Handler(DataSet result)
     {
 
+        //DataTable dataTable = dataTableCollection[0];
+        //DataColumnCollection dataColumnCollection = dataTable.Columns;
+
+        DataTableCollection dataTableCollection = result.Tables;
+
+        List<List<CodeStrcut>> codeCollections = new List<List<CodeStrcut>>();
+
+        for (int tableCount = 0; tableCount < result.Tables.Count; tableCount++)
+        {
+            DataTable dataTable = dataTableCollection[tableCount];
+
+            DataRowCollection dataRowCollection = dataTable.Rows;
+            DataColumnCollection dataColumnCollection = dataTable.Columns;
+
+            List<CodeStrcut> tableCodeStruct = new List<CodeStrcut>();
+
+
+            for (int coloumCount = 1; coloumCount < dataColumnCollection.Count; coloumCount++)
+            {
+                CodeStrcut codeStrcut = new CodeStrcut();
+                for (int rowCount = 2; rowCount < 4; rowCount++)
+                {
+                    string code = string.Format("{0}", dataRowCollection[rowCount][dataColumnCollection[coloumCount]].ToString());
+                    codeStrcut.AssignValue(rowCount - 2, code);
+                }
+                tableCodeStruct.Add(codeStrcut);
+            }
+            codeCollections.Add(tableCodeStruct);
+        }
+
+        for (int i = 0; i < codeCollections.Count; i++)
+        {
+            for (int j = 0; j < codeCollections[i].Count; j++)
+            {
+                CodeStrcut codeStrcut = codeCollections[i][j];
+                Debug.Log(codeStrcut.GetSharpCode());
+            }
+        }
     }
 }
 
@@ -124,4 +169,40 @@ public class ComplexHandleTemple : HandleTempleInterface
 
     }
 }
+
+public struct CodeStrcut
+{
+    string VaribleName { get; set; }
+    string VaribleType { get; set; }
+    string GenerateJson { get; set; }
+    string GenerateXML { get; set; }
+
+    public void AssignValue(int index, string value)
+    {
+        switch (index)
+        {
+            case 0:
+                VaribleName = value;
+                break;
+            case 1:
+                VaribleType = value;
+                break;
+            case 2:
+                GenerateJson = value;
+                break;
+            case 3:
+                GenerateXML = value;
+                break;
+            default:
+                break;
+        }
+    }
+
+    public string GetSharpCode()
+    {
+        return string.Format("public {0} {1};", VaribleType, VaribleName);
+    }
+
+}
+
 
