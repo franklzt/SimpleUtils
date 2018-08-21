@@ -1,0 +1,12 @@
+﻿namespace GameDataTable
+{
+    public class #SCRIPTNAME# : ConfigTableBase
+    {
+        #CodeList#
+    }
+
+    public class #SCRIPTNAME#Manager : TableManager<#SCRIPTNAME#>
+    {
+
+    }
+}

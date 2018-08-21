@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.IO;
 
 public static class SimpleUtils
 {
@@ -28,4 +29,32 @@ public static class SimpleUtils
 
 
     #endregion
+
+
+    public static string GetBasePath()
+    {
+        string basePath = Application.dataPath;
+        string replacePath = "Client/Assets";
+        basePath = basePath.Replace(replacePath, "");
+        return basePath;
+    }
+
+    public static void ProcessProto(string exePath, string arg)
+    {
+        System.Diagnostics.Process foo = new System.Diagnostics.Process();
+        foo.StartInfo.FileName = exePath;
+        foo.StartInfo.Arguments = arg;
+        foo.Start();
+    }
+}
+
+public class WriteCodeToFile
+{
+    public void WriteToFile(string fileName, string script)
+    {
+        FileStream fileStream = File.Create(fileName);
+        byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(script);
+        fileStream.Write(byteArray, 0, byteArray.Length);
+        fileStream.Close();
+    }
 }

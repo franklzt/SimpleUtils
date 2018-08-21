@@ -1,10 +1,10 @@
 ﻿using ExcelDataReader;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
-using System.Collections.Generic;
 
 public static class ExcelCodeGenerator
 {
@@ -34,6 +34,13 @@ public static class ExcelCodeGenerator
         {
             handlers[i].StartReadData(filesNames[i]);
         }
+    }
+
+    [MenuItem("Assets/Helper/SQLitCodeGenerator")]
+    private static void CodeGeneratorFromSqlit()
+    {
+        GameDataTable.SQLTableCodeGenerator.GenerateCode();
+        AssetDatabase.Refresh();
     }
 }
 
@@ -172,10 +179,10 @@ public class ComplexHandleTemple : HandleTempleInterface
 
 public struct CodeStrcut
 {
-    string VaribleName { get; set; }
-    string VaribleType { get; set; }
-    string GenerateJson { get; set; }
-    string GenerateXML { get; set; }
+    private string VaribleName { get; set; }
+    private string VaribleType { get; set; }
+    private string GenerateJson { get; set; }
+    private string GenerateXML { get; set; }
 
     public void AssignValue(int index, string value)
     {

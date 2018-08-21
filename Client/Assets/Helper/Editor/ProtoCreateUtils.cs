@@ -9,7 +9,7 @@ public static class ProtoCreateUtils
     [MenuItem("Assets/Helper/UpdateProto")]
     private static void UpdateProto()
     {
-        string basePath = GetBasePath();
+        string basePath = SimpleUtils.GetBasePath();
         string externalExe = string.Format("{0}generator/protogen", basePath);
         string sourcePath = string.Format("{0}Client/Assets/protoSource/", basePath);
         string clientPath = string.Format("{0}Client/Assets/protoCode/", basePath);
@@ -26,26 +26,12 @@ public static class ProtoCreateUtils
             string clientArg = string.Format("-i:{0}{2}.proto -o:{1}{2}.cs", sourcePath, clientPath, fileNames[i]);
             string serverArg = string.Format("-i:{0}{2}.proto -o:{1}/{2}.cs", sourcePath, serverPath, fileNames[i]);
             UnityEngine.Debug.Log(string.Format("{0} {1}", externalExe, clientArg));
-            ProcessProto(externalExe, clientArg);
-            ProcessProto(externalExe, serverArg);
+            SimpleUtils.ProcessProto(externalExe, clientArg);
+            SimpleUtils.ProcessProto(externalExe, serverArg);
         }
     }
 
-    private static string GetBasePath()
-    {
-        string basePath = Application.dataPath;
-        string replacePath = "Client/Assets";
-        basePath = basePath.Replace(replacePath, "");
-        return basePath;
-    }
-
-    private static void ProcessProto(string exePath, string arg)
-    {
-        Process foo = new Process();
-        foo.StartInfo.FileName = exePath;
-        foo.StartInfo.Arguments = arg;
-        foo.Start();
-    }
+   
 
     [MenuItem("Assets/Helper/GenerateCode")]
     private static void GenerateCode()
@@ -69,9 +55,9 @@ public static class ProtoCreateUtils
     private static void CopyMessageCodeToServer()
     {
         string serverPattern = "SimpleServer/SimpleServer/messageCode";
-        string serverPath = string.Format("{0}{1}", GetBasePath(), serverPattern);
+        string serverPath = string.Format("{0}{1}", SimpleUtils.GetBasePath(), serverPattern);
         string clientPattern = "Client/Assets/messageCode";
-        string clientPath = string.Format("{0}{1}", GetBasePath(), clientPattern);
+        string clientPath = string.Format("{0}{1}", SimpleUtils.GetBasePath(), clientPattern);
 
         if (!Directory.Exists(serverPath))
         {
@@ -189,30 +175,25 @@ public class GenerateCodeServerPath : GenerateCodeBasePath
 public class GenerateCodeToFile
 {
     private readonly string generateCodePath = "";
-
-    private void WriteToFile(string fileName, string script)
-    {
-        FileStream fileStream = File.Create(generateCodePath);
-        byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(script);
-        fileStream.Write(byteArray, 0, byteArray.Length);
-        fileStream.Close();
-    }
-
+    WriteCodeToFile writeCodeToFile;
+   
     public GenerateCodeToFile(GenerateCodeBasePath basePath, string script, bool replacefile = true)
     {
+        writeCodeToFile = new WriteCodeToFile();
+
         generateCodePath = basePath.GetFilePath();
         bool needReaceCode = true;
 
         if (!File.Exists(generateCodePath))
         {
-            WriteToFile(basePath.FileName(), script);
+            writeCodeToFile.WriteToFile(basePath.FileName(), script);
             needReaceCode = false;
         }
 
         if (replacefile && needReaceCode)
         {
             File.Delete(generateCodePath);
-            WriteToFile(basePath.FileName(), script);
+            writeCodeToFile.WriteToFile(basePath.FileName(), script);
         }
     }
 }
