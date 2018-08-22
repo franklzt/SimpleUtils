@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using  SQLite4Unity3d;
+using SQLite4Unity3d;
 using UnityEngine;
 using System.IO;
 
@@ -29,18 +29,30 @@ namespace GameDataTable
 
         public string ReplaceSQLType(string sqlType)
         {
-            if(sqlLookTable.ContainsKey(sqlType))
+            if (sqlLookTable.ContainsKey(sqlType))
             {
-               return sqlLookTable[sqlType];
+                return sqlLookTable[sqlType];
             }
 
-            return "Error";                    
+            return "Error";
+        }
+    }
+
+
+    public class BaseClassMember
+    {
+        public bool IsBaseClassMember(string baseClassMemberName)
+        {
+            return baseClassMemberName == "DataID";
         }
     }
 
 
     public class SQLTableCodeGenerator
     {
+
+
+
         public static void GenerateCode()
         {
             string sql = "SELECT * FROM sqlite_master where type='table' AND tbl_name != 'sqlite_sequence'";
@@ -51,6 +63,7 @@ namespace GameDataTable
             string templemateStr = File.ReadAllText(templematePath);
             SQLToSharp sqlReplace = new SQLToSharp();
             WriteCodeToFile codeWrite = new WriteCodeToFile();
+            BaseClassMember baseClassMember = new BaseClassMember();
             foreach (var item in tableViews)
             {
                 // string replaceTypeName = templemateStr.Replace("#SCRIPTNAME#", item.name);
@@ -64,24 +77,25 @@ namespace GameDataTable
                     splits[i] = splits[i].Trim();
                     string[] codeSplited = splits[i].Split(' ', '\t');
 
-                    string typeName =  codeSplited[0];
-                    string type =  sqlReplace.ReplaceSQLType(codeSplited[1]);
+                    string typeName = codeSplited[0];
+
+                    if (baseClassMember.IsBaseClassMember(typeName))
+                    {
+                        continue;
+                    }
+                    string type = sqlReplace.ReplaceSQLType(codeSplited[1]);
                     string getset = @"{get;set;}";
-                    string singleCode = string.Format(@"public {0} {1} {2}", type, typeName, getset);
+                    string singleCode = string.Format(@"        public {0} {1} {2}", type, typeName, getset);
                     code += singleCode + "\n";
                 }
 
                 string replaceClassName = templemateStr.Replace("#SCRIPTNAME#", item.name);
                 string finalCode = replaceClassName.Replace("#CodeList#", code);
 
-                string finalSourcePath = string.Format("{0}/DataBaseCode/{1}.cs", Application.dataPath,item.tbl_name);
+                string finalSourcePath = string.Format("{0}/DataBaseCode/{1}.cs", Application.dataPath, item.tbl_name);
 
                 codeWrite.WriteToFile(finalSourcePath, finalCode);
             }
-
-            
-
-
         }
     }
 }

@@ -7,5 +7,6 @@ public class DataBaseUI : MonoBehaviour
 	void Start ()
     {
         GameDataTable.DataTableTest.Test();
+        GameDataTable.DataTableTest.CreateRoleTest();
     }	
 }

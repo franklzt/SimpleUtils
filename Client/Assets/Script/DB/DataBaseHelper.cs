@@ -69,7 +69,7 @@ namespace GameDataTable
         var dbPath = filepath;
 #endif
             Connection = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
-           // Debug.Log("Final PATH: " + dbPath);
+            // Debug.Log("Final PATH: " + dbPath);
             return Connection;
         }
     }
@@ -77,10 +77,22 @@ namespace GameDataTable
     public class SinglgInstance<T, U> where T : U, new()
     {
         static readonly U UValue = new T();
-        public static U GetSingleInstance()
+        public static U GetSingleInstance { get { return UValue; } }
+    }
+
+    public class SinglgInstance<T> where T : new()
+    {
+        static readonly T Instance = new T();
+
+        public static T SingleInstance
         {
-            return UValue;           
+            get { return Instance; }
         }
+    }
+
+    public class TableManagerInstance<T, M> : SinglgInstance<T> where T : new() where M : new()
+    {
+        public M ManagerInstance { get; } = new M();
     }
 
     public static class DataBaseHelperExtend
@@ -93,7 +105,7 @@ namespace GameDataTable
 
         public static SQLiteConnection GetDataBaseConnnectInterface(string DatabaseName)
         {
-            return SinglgInstance<DataBaseHelper, DataBaseConnnectInterface>.GetSingleInstance().GetConnection(DatabaseName);
+            return SinglgInstance<DataBaseHelper, DataBaseConnnectInterface>.GetSingleInstance.GetConnection(DatabaseName);
         }
     }
 }
