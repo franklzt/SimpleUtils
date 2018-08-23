@@ -28,7 +28,7 @@ namespace GameDataTable
             ActorTable actorTable = ActorTableInstance.GetData(allCreateRoles[playerSelectRole].ActorTable_DataID);
             ActorJobTypeTable actorJobType = ActorJobTypeTableInstance.GetData(actorTable.ActorJobTypeTable_DataID);
 
-            LoginData loginData = new LoginData() { UserName = "UserName", Password = "password",ActorTable_DataID = actorTable.DataID };
+            LoginData loginData = new LoginData() { UserName = "UserName", Password = "password", ActorTable_DataID = actorTable.DataID };
             LoginTest loginTest = new LoginTest();
             PlayerTable reslutTable = loginTest.OnLogin(loginData);
             CurrentPlayer.SetInstance(reslutTable);

@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Collections;
 using System.IO;
 #endif
+
 namespace GameDataTable
 {
     public abstract class DataBaseConnnectInterface

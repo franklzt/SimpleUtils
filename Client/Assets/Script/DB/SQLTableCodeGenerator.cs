@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
-using SQLite4Unity3d;
-using UnityEngine;
+﻿using SQLite4Unity3d;
+using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace GameDataTable
 {
-    class TableView
+    internal class TableView
     {
         public string type { get; set; }
         public string name { get; set; }
@@ -15,16 +16,23 @@ namespace GameDataTable
     }
 
 
-    public class SQLToSharp
+    public interface ISQLToSharp
     {
-        Dictionary<string, string> sqlLookTable;
+        string ReplaceSQLType(string sqlType);
+    }
+
+    public class SQLToSharp : ISQLToSharp
+    {
+        private Dictionary<string, string> sqlLookTable;
         public SQLToSharp()
         {
-            sqlLookTable = new Dictionary<string, string>();
-            sqlLookTable.Add("INTEGER", "int");
-            sqlLookTable.Add("STRING", "string");
-            sqlLookTable.Add("BOOLEAN", "bool");
-            sqlLookTable.Add("String[]", "string[]");
+            sqlLookTable = new Dictionary<string, string>
+            {
+                { "INTEGER", "int" },
+                { "STRING", "string" },
+                { "BOOLEAN", "bool" },
+                { "String[]", "string[]" }
+            };
         }
 
         public string ReplaceSQLType(string sqlType)
@@ -34,7 +42,7 @@ namespace GameDataTable
                 return sqlLookTable[sqlType];
             }
 
-            return "Error";
+            return "string";
         }
     }
 
@@ -48,11 +56,104 @@ namespace GameDataTable
     }
 
 
+    public struct CodeFormat
+    {
+        public string CodeTypeName;
+        public string CodeType;
+    }
+
+
+    public interface ICodeFormatManager
+    {
+        string GetCodeResult();
+        void Add(CodeFormat code);
+    }
+
+    public class CodeFormatManager: ICodeFormatManager
+    {
+        List<CodeFormat> codeFormats = new List<CodeFormat>();
+        BaseClassMember baseClassMember;
+        public CodeFormatManager()
+        {
+           baseClassMember = new BaseClassMember();
+        }
+
+        public void Add(CodeFormat code)
+        {
+            if (!codeFormats.Contains(code))
+            {
+                codeFormats.Add(code);
+            }
+        }
+
+        public string GetCodeResult()
+        {
+            string code = "";
+            string getset = @" { get; set; }";
+            for (int i = 0; i < codeFormats.Count; i++)
+            {
+                if(baseClassMember.IsBaseClassMember(codeFormats[i].CodeTypeName))
+                {
+                    continue;
+                }
+                code += string.Format("     public  {0} {1} {2} \n       ", codeFormats[i].CodeType, codeFormats[i].CodeTypeName, getset);
+            }
+            return code;
+        }
+
+
+    }
+
+
+    public interface IRegularExpressionHelper
+    {
+        string GetExpresionResult(string input);
+    }
+
+
+    public class RegularExpressionHelper: IRegularExpressionHelper
+    {
+        public string GetExpresionResult(string input)
+        {
+            ISQLToSharp sqlReplace = new SQLToSharp();
+
+            string finalResult = "";
+            string pattern = @"\((.*)";
+            Match match = Regex.Match(input, pattern);
+            pattern = @"\(|\sPRIMARY|KEY|ASC|AUTOINCREMENT|NOT|NULL|UNIQUE|DEFAULT\s\(\d+\)|,|\)|\bDEFAULT\s\w+|\d+\)\s|NULL|\'|DEFAULT";
+            Regex regex = new Regex(pattern);
+            string result = regex.Replace(match.Value, "");
+            pattern = @"\w+";
+            regex = new Regex(pattern);
+            MatchCollection matchCollection = regex.Matches(result);
+            List<CodeFormat> codeList = new List<CodeFormat>();
+            ICodeFormatManager formatManager = new CodeFormatManager();
+            CodeFormat codeFormat = new CodeFormat();
+            for (int i = 0; i < matchCollection.Count; i++)
+            {
+                string matchValue = matchCollection[i].Value;
+
+                if((i % 2) == 0)
+                {
+                    codeFormat.CodeTypeName = string.Format("{0}", matchCollection[i].Value);
+                }
+                else
+                {
+                    codeFormat.CodeType = string.Format("{0}", sqlReplace.ReplaceSQLType(matchCollection[i].Value));
+                    formatManager.Add(codeFormat);
+                }
+            }
+
+
+            finalResult = formatManager.GetCodeResult();
+            return finalResult;
+        }
+    }
+
+
+
     public class SQLTableCodeGenerator
     {
-
-
-
         public static void GenerateCode()
         {
             string sql = "SELECT * FROM sqlite_master where type='table' AND tbl_name != 'sqlite_sequence'";
@@ -61,39 +162,17 @@ namespace GameDataTable
 
             string templematePath = string.Format("{0}/Helper/Templemate/TableTemplate.txt", Application.dataPath);
             string templemateStr = File.ReadAllText(templematePath);
-            SQLToSharp sqlReplace = new SQLToSharp();
+
             WriteCodeToFile codeWrite = new WriteCodeToFile();
-            BaseClassMember baseClassMember = new BaseClassMember();
-            foreach (var item in tableViews)
+
+            IRegularExpressionHelper regularExpressionHelper = new RegularExpressionHelper();
+
+            foreach (TableView item in tableViews)
             {
-                // string replaceTypeName = templemateStr.Replace("#SCRIPTNAME#", item.name);
-                string needMatch = item.sql;
-                string removePattern = string.Format("CREATE TABLE {0} (", item.tbl_name);
-                string removeStr = needMatch.Replace(removePattern, "");
-                string[] splits = removeStr.Split(',');
-                string code = "";
-                for (int i = 0; i < splits.Length; i++)
-                {
-                    splits[i] = splits[i].Trim();
-                    string[] codeSplited = splits[i].Split(' ', '\t');
-
-                    string typeName = codeSplited[0];
-
-                    if (baseClassMember.IsBaseClassMember(typeName))
-                    {
-                        continue;
-                    }
-                    string type = sqlReplace.ReplaceSQLType(codeSplited[1]);
-                    string getset = @"{get;set;}";
-                    string singleCode = string.Format(@"        public {0} {1} {2}", type, typeName, getset);
-                    code += singleCode + "\n";
-                }
-
+                string code = regularExpressionHelper.GetExpresionResult(item.sql);
                 string replaceClassName = templemateStr.Replace("#SCRIPTNAME#", item.name);
                 string finalCode = replaceClassName.Replace("#CodeList#", code);
-
                 string finalSourcePath = string.Format("{0}/DataBaseCode/{1}.cs", Application.dataPath, item.tbl_name);
-
                 codeWrite.WriteToFile(finalSourcePath, finalCode);
             }
         }

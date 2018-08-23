@@ -2,7 +2,6 @@
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
-using TestLogic;
 
 public class PlayerLoginTest {
 
@@ -10,7 +9,11 @@ public class PlayerLoginTest {
     public void PlayerLoginTestSimplePasses() {
 
         GameObject go = new GameObject("Go");
+        UITest test = go.AddComponent<UITest>();
+        Assert.AreEqual(test.HelooTest(), false);
 
+        DataBaseUI dataBaseUI = go.AddComponent<DataBaseUI>();
+        Assert.AreEqual(dataBaseUI.Test(),false);
         // Use the Assert class to test conditions.
     }
 
@@ -21,17 +24,5 @@ public class PlayerLoginTest {
         // Use the Assert class to test conditions.
         // yield to skip a frame
         yield return null;
-    }
-}
-
-
-namespace TestLogic
-{
-    public class Logic
-    {
-        public static void Test(){
-            
-            
-        }
     }
 }

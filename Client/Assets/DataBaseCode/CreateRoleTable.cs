@@ -12,8 +12,8 @@ namespace GameDataTable
 {
     public class CreateRoleTable : ConfigTableBase
     {
-                public int ActorTable_DataID {get;set;}
-
+             public  int ActorTable_DataID  { get; set; } 
+       
     }
 
     public class CreateRoleTableManager : TableManager<CreateRoleTable>

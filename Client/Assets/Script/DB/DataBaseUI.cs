@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
 public class DataBaseUI : MonoBehaviour
 {
-	void Start ()
+	public bool Test ()
     {
         GameDataTable.DataTableTest.Test();
         GameDataTable.DataTableTest.CreateRoleTest();
+        return false;
     }	
 }
