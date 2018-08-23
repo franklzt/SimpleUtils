@@ -562,8 +562,8 @@ namespace SQLite4Unity3d
 			[Column ("name")]
 			public string Name { get; set; }
 
-//			[Column ("type")]
-//			public string ColumnType { get; set; }
+			[Column ("type")]
+			public string ColumnType { get; set; }
 
 			public int notnull { get; set; }
 
@@ -579,7 +579,10 @@ namespace SQLite4Unity3d
 
 		public List<ColumnInfo> GetTableInfo (string tableName)
 		{
-			var query = "pragma table_info(\"" + tableName + "\")";			
+			var query = "pragma table_info(\"" + tableName + "\")";	
+            
+            
+
 			return Query<ColumnInfo> (query);
 		}
 
