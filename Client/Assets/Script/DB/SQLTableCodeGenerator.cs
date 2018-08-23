@@ -111,6 +111,27 @@ namespace GameDataTable
     }
 
 
+    public class TableStructHelper : IRegularExpressionHelper
+    {
+        public string GetExpresionResult(string tableName)
+        {
+            SQLiteConnection connection = DataBaseHelperExtend.GetDefaultDataBaseConnnect();
+            List<CodeFormat> codeList = new List<CodeFormat>();
+            ICodeFormatManager formatManager = new CodeFormatManager();
+            ISQLToSharp sqlReplace = new SQLToSharp();
+            foreach (var item in connection.GetTableInfo(tableName))
+            {
+                string CodeType = string.Format("{0}", sqlReplace.ReplaceSQLType(item.ColumnType));
+                                                
+                CodeFormat codeFormat = new CodeFormat() { CodeTypeName  = item.Name,CodeType = CodeType};
+                formatManager.Add(codeFormat);
+            }
+            string finalResult = formatManager.GetCodeResult();
+            return finalResult;
+        }
+    }
+
+
     public class RegularExpressionHelper: IRegularExpressionHelper
     {
         public string GetExpresionResult(string input)
@@ -165,11 +186,11 @@ namespace GameDataTable
 
             WriteCodeToFile codeWrite = new WriteCodeToFile();
 
-            IRegularExpressionHelper regularExpressionHelper = new RegularExpressionHelper();
+            IRegularExpressionHelper regularExpressionHelper = new TableStructHelper();
 
             foreach (TableView item in tableViews)
             {
-                string code = regularExpressionHelper.GetExpresionResult(item.sql);
+                string code = regularExpressionHelper.GetExpresionResult(item.tbl_name);
                 string replaceClassName = templemateStr.Replace("#SCRIPTNAME#", item.name);
                 string finalCode = replaceClassName.Replace("#CodeList#", code);
                 string finalSourcePath = string.Format("{0}/DataBaseCode/{1}.cs", Application.dataPath, item.tbl_name);

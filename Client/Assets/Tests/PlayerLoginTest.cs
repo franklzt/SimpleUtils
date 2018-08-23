@@ -8,13 +8,7 @@ public class PlayerLoginTest {
     [Test]
     public void PlayerLoginTestSimplePasses() {
 
-        GameObject go = new GameObject("Go");
-        UITest test = go.AddComponent<UITest>();
-        Assert.AreEqual(test.HelooTest(), false);
-
-        DataBaseUI dataBaseUI = go.AddComponent<DataBaseUI>();
-        Assert.AreEqual(dataBaseUI.Test(),false);
-        // Use the Assert class to test conditions.
+       
     }
 
     // A UnityTest behaves like a coroutine in PlayMode
