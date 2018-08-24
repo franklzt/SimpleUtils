@@ -83,12 +83,7 @@ namespace GameDataTable
 
     public class SinglgInstance<T> where T : new()
     {
-        static readonly T Instance = new T();
-
-        public static T SingleInstance
-        {
-            get { return Instance; }
-        }
+        public static T SingleInstance { get; } = new T();
     }
 
     public class TableManagerInstance<T, M> : SinglgInstance<T> where T : new() where M : new()

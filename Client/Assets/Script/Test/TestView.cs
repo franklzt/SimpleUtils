@@ -1,5 +1,7 @@
 ﻿using Game;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 public class TestView : MonoBehaviour
 {
@@ -14,5 +16,20 @@ public class TestView : MonoBehaviour
         {
 
         }
+    }
+}
+
+public class TestData
+{
+    public int ID { get; set; }
+}
+
+public class TestDataCollection
+{
+    public List<TestData> Datas = new List<TestData>();
+
+    void Test()
+    {
+        Datas.Where(testdata => testdata.ID == 3);
     }
 }
