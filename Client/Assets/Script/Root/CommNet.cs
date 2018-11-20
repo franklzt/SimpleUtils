@@ -55,6 +55,11 @@ namespace Game
 
         public void SendNetMessage()
         {
+            if(connection == null)
+            {
+                return;
+            }
+
             if(connection.ConnectionAlive())
             {
                 string messageToSend = "This is message";
@@ -71,6 +76,12 @@ namespace Game
 
         public void OnDestroy()
         {
+            if(connection == null)
+            {
+                NetworkComms.Shutdown();
+                connectThread.Abort();
+                return;
+            }
             if (connection.ConnectionAlive())
             {
                 connection.CloseConnection(false);
